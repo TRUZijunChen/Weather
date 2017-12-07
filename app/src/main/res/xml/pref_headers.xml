@@ -2,27 +2,23 @@
 
     <!-- These settings headers are only used on tablets. -->
 
-
     <header
-        android:fragment="com.team.jz.weather.ActivitiesAndFragments.SettingsActivity$NotificationPreferenceFragment"
-        android:icon="@drawable/ic_notifications_black_24dp"
-        android:title="@string/pref_header_notifications" />
-    <header
-        android:fragment="com.team.jz.weather.ActivitiesAndFragments.SettingsActivity$TemperatureUnitPreferenceFragment"
         android:icon="@drawable/icons8_temperature_26"
-        android:title="@string/pref_header_temperature_unit" />
+        android:title="@string/units"
+        android:fragment="com.team.jz.weather.ActivitiesAndFragments.SettingsActivity$UnitsPreferenceFragment"/>
+
+    <!--<header-->
+        <!--android:icon="@drawable/ic_notifications_black_24dp"-->
+        <!--android:title="@string/pref_header_notifications" />-->
 
     <header
-        android:fragment="com.team.jz.weather.ActivitiesAndFragments.SettingsActivity$LocationSettingFragment"
-        android:icon="@drawable/icons8_map_editing_26"
-        android:title="@string/pref_header_enable_or_disable_location" />
+        android:icon="@drawable/ic_sync_black_24dp"
+        android:title="@string/pref_header_data_sync"
+        android:fragment="com.team.jz.weather.ActivitiesAndFragments.SettingsActivity$DataSyncPreferenceFragment"/>
 
     <header
         android:icon="@drawable/icons8_view_terms_of_use_26"
-        android:title="@string/pref_header_terms_of_use" />
-
-    <header
-    android:icon="@drawable/ic_info_black_24dp"
-    android:title="@string/pref_header_about" />
+        android:title="@string/about"
+        android:fragment="com.team.jz.weather.ActivitiesAndFragments.SettingsActivity$WebViewFragment"/>
 
 </preference-headers>

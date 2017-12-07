@@ -1,13 +1,13 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/background_image"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal">
 
     <include
         android:id="@+id/today_data"
         layout="@layout/today_weather_detail_data_layout"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -20,9 +20,9 @@
         android:id="@+id/forecast_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/today_data"
         android:overScrollMode="always"
-        tools:listitem="@layout/forecast_weather_reading_item" />
+        tools:listitem="@layout/forecast_weather_reading_item"
+        android:layout_below="@+id/today_data"
+        android:layout_alignParentStart="true"/>
 
-</RelativeLayout>
+</LinearLayout>

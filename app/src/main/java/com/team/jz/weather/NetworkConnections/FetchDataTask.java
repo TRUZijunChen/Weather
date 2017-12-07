@@ -1,11 +1,16 @@
 package com.team.jz.weather.NetworkConnections;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.team.jz.weather.ActivitiesAndFragments.SettingsActivity;
 import com.team.jz.weather.R;
 import com.team.jz.weather.Weather.Utilities;
 import com.team.jz.weather.Weather.WeatherJsonParser;
@@ -36,10 +41,25 @@ public class FetchDataTask extends AsyncTask<String, Integer, ArrayList<WeatherR
         context = c;
         this.callback = downloadCallback;
     }
+
 //TODO: CHECK NETWORK STATE BEFORE EXECUTING
     @Override
     protected ArrayList<WeatherReading> doInBackground(String... strings) {
 
+        // Inflate the layout for this fragment
+        SharedPreferences sharedPreferences = PreferenceManager.
+                getDefaultSharedPreferences(context);
+        int c = Integer.parseInt(sharedPreferences.getString("units_pref_list","0"));
+        String unitVal;
+        Log.d(c+"pppppppppppppppppp", "doInBackground: ");
+        if(c == 0){
+            unitVal =Utilities.METRIC_UNITS_VALUE;
+        }else{
+            unitVal =Utilities.IMPERIAL_UNITS_VALUE;
+        }
+        Log.d(unitVal+"88888888888888888888", "doInBackground: ");
+
+        sharedPreferences.edit().putString("units_pref_list",c+"").apply();
         //strings[0] = TODAY OR FORECAST
         //strings[1] = CITY OR ZIP
         ArrayList<WeatherReading> weatherReadings = null;
@@ -49,7 +69,7 @@ public class FetchDataTask extends AsyncTask<String, Integer, ArrayList<WeatherR
             todayUri = Uri.parse(Utilities.FORERCAST_WEATHER_BASE_URL).buildUpon().
                     appendQueryParameter(Utilities.CITY_PARAMETER, strings[1]).
                     appendQueryParameter(Utilities.FORMAT_PARAMETER, Utilities.FORMAT_VALUE).
-                    appendQueryParameter(Utilities.UNITS_PARAMETER, Utilities.UNITS_VALUE).
+                    appendQueryParameter(Utilities.UNITS_PARAMETER, unitVal).
                     appendQueryParameter(Utilities.API_PARAMETER, Utilities.OPEN_WEATHER_API_KEY).build();
         }
         else {
@@ -61,14 +81,14 @@ public class FetchDataTask extends AsyncTask<String, Integer, ArrayList<WeatherR
                             appendQueryParameter(Utilities.LATITUDE_PARAMETER, strings[2]).
                             appendQueryParameter(Utilities.LONGITUDE_PARAMETER, strings[3]).
                             appendQueryParameter(Utilities.FORMAT_PARAMETER, Utilities.FORMAT_VALUE).
-                            appendQueryParameter(Utilities.UNITS_PARAMETER, Utilities.UNITS_VALUE).
+                            appendQueryParameter(Utilities.UNITS_PARAMETER, unitVal).
                             appendQueryParameter(Utilities.API_PARAMETER, Utilities.OPEN_WEATHER_API_KEY).build();
                 } else {
                     //IF LATITUDE AND LONGITUDE ARE NOT AVAOLABLE, USE CITY NAME TO BUILD URI
                     todayUri = Uri.parse(Utilities.CURRENT_WEATHER_BASE_URL).buildUpon().
                             appendQueryParameter(Utilities.CITY_PARAMETER, strings[1]).
                             appendQueryParameter(Utilities.FORMAT_PARAMETER, Utilities.FORMAT_VALUE).
-                            appendQueryParameter(Utilities.UNITS_PARAMETER, Utilities.UNITS_VALUE).
+                            appendQueryParameter(Utilities.UNITS_PARAMETER, unitVal).
                             appendQueryParameter(Utilities.API_PARAMETER, Utilities.OPEN_WEATHER_API_KEY).build();
                 }
             } else if (strings[0].equals(Utilities.FORECAST_WEATHER)) {
@@ -79,7 +99,7 @@ public class FetchDataTask extends AsyncTask<String, Integer, ArrayList<WeatherR
                             appendQueryParameter(Utilities.LATITUDE_PARAMETER, strings[2]).
                             appendQueryParameter(Utilities.LONGITUDE_PARAMETER, strings[3]).
                             appendQueryParameter(Utilities.FORMAT_PARAMETER, Utilities.FORMAT_VALUE).
-                            appendQueryParameter(Utilities.UNITS_PARAMETER, Utilities.UNITS_VALUE).
+                            appendQueryParameter(Utilities.UNITS_PARAMETER, unitVal).
                             appendQueryParameter(Utilities.API_PARAMETER, Utilities.OPEN_WEATHER_API_KEY).
                             appendQueryParameter(Utilities.COUNT, Utilities.CNT_VAL).build();
                 } else {
@@ -87,33 +107,25 @@ public class FetchDataTask extends AsyncTask<String, Integer, ArrayList<WeatherR
                     todayUri = Uri.parse(Utilities.FORERCAST_WEATHER_BASE_URL).buildUpon().
                             appendQueryParameter(Utilities.CITY_PARAMETER, strings[1]).
                             appendQueryParameter(Utilities.FORMAT_PARAMETER, Utilities.FORMAT_VALUE).
-                            appendQueryParameter(Utilities.UNITS_PARAMETER, Utilities.UNITS_VALUE).
+                            appendQueryParameter(Utilities.UNITS_PARAMETER, unitVal).
                             appendQueryParameter(Utilities.API_PARAMETER, Utilities.OPEN_WEATHER_API_KEY).
                             appendQueryParameter(Utilities.COUNT, Utilities.CNT_VAL).build();
                 }
             }
         }
-
             if(todayUri==null){
-
                 return null;
             }
                 try{
-
                     URL url = new URL(todayUri.toString());
-
                     Log.d(TAG, "doInBackground: "+ url.toString());
                     HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
-
                     RESPONSE_CODE = httpConnection.getResponseCode();
-
                     if (RESPONSE_CODE>=200 && RESPONSE_CODE<=300){
                         InputStream inputStream = httpConnection.getInputStream();
-
                         BufferedReader inputStreamReader = new BufferedReader(new InputStreamReader(inputStream));
                         String file = "";
                         String line = "";
-
                         while (line!=null){
                             file+=line;
                             line=inputStreamReader.readLine();
@@ -156,5 +168,12 @@ public class FetchDataTask extends AsyncTask<String, Integer, ArrayList<WeatherR
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        ConnectivityManager connectivityManager = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager
+                .getActiveNetworkInfo();
+        if (activeNetworkInfo == null && !activeNetworkInfo.isConnected()){
+            Toast.makeText(context,context.getString(R.string.internet_connection),Toast.LENGTH_SHORT).show();
+        }
     }
 }
